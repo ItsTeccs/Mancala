@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 #include <iomanip>
-#include "mancala.h"
 
 class Mancala
 {
@@ -14,12 +13,10 @@ class Mancala
 
     void Move()
     {
-        this->DisplayBoard(this->topScore, this->bottomScore, this->topRow, this->bottomRow);
+        DisplayBoard(this->topScore, this->bottomScore, this->topRow, this->bottomRow);
     }
 
     private:
-    int x = 0;
-    int y = 0;
     int topScore;
     int bottomScore;
     int topRow[6] = {14, 4, 4, 4, 4, 4};
@@ -57,11 +54,3 @@ class Mancala
         << "[    ] "  << '\n';
     }
 };
-
-int main(){
-    Mancala gameBoard;
-    gameBoard.Move();
-
-    return 0;
-
-}
