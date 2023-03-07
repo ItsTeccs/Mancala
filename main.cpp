@@ -7,8 +7,9 @@ class Mancala
     public:
     Mancala()
     {
-        this->topScore = 4;
-        this->bottomScore = 4;
+        // TODO: overload Mancala(int playerFirst) overloaded constructor to choose player going first
+        this->topScore = 0;
+        this->bottomScore = 0;
     }
 
     void Move()
@@ -18,32 +19,30 @@ class Mancala
          * handles game logic for each player as well as allocating points around the board
          */
         bool moveValid = false;
+        bool updateTurnPlayer = true;
         int numMoves;
         int position;
+
         if(this->player == 0)
         {
-            std::cout << "Top row player input position 0 - 5 to move.";
+            std::cout << "Top row player input position 1 - 6 to move: ";
             std::cin >> position;
         }
         else
         {
-            std::cout << "Top row player input position 0 - 5 to move.";
+            std::cout << "Bottom row player input position 1 - 6 to move: ";
             std::cin >> position;
             // when player == 1
         }
+        position--; // subtract one from player input to go from 1-6 board space notation to 0-5 array notation
 
         do
          {
-            if(this->player == 0 && (position >= 6 && position <= 11))
+            if(!(position >= 0 and position <= 5))
             {
-                std::cout << "Invalid move entered. The top row player may only enter positions 0 - 5 to move.\n";
+                std::cout << "Invalid move. Please enter a position 1 - 6 to move that space on your row: ";
                 std::cin >> position;
-
-            }
-            else if(this->player == 1 && (position >= 0 && position <= 5))
-            {
-                std::cout << "Invalid move entered. The bottom row player may only enter positions 6 - 11 to move.\n";
-                std::cin >> position;
+                position--; // subtract one from player input to go from 1-6 board space notation to 0-5 array notation
             }
             else
             {
@@ -51,36 +50,36 @@ class Mancala
             }
         }while(!moveValid);
 
-        if(this->player == 0)
-         {
-            this->y = 0;
-            this->x = position;
-         }
-        else if (player == 1)
-         {
-            this->y = 1;
-            this->x = position - 6;
-         }
-
+        this->y = player;
+        this->x = position;
 
         numMoves = this->board[this->y][this->x];
         this->board[this->y][this->x] = 0;
-        if(this->x == 5 && this->y == 0)
+        if(this->x == 0 && this->y == 0)
         {
             this->y = 1;
+            if(player == 0)
+            {
+                numMoves--; // player scored a point, subtract a move before going into the for-loop move handler
+                topScore++; // the right goal / bottom score player scores on this side of the board
+            }
         }
-        else if(this->x == 0 && this->y == 1)
+        else if(this->x == 5 && this->y == 1)
         {
             this->y = 0;
+            if (player == 1)
+            {
+                numMoves--; // player scored a point, subtract a move before going into the for-loop move handler
+                bottomScore++; // the left goal / top score player scores on this side of the board
+            }
         }
-
-        if(y == 0)
-        {
-            this->x++;
-        }
-        else
+        else if (y == 0)
         {
             this->x--;
+        }
+        else if(y == 1)
+        {
+            this->x++;
         }
 
 
@@ -88,25 +87,49 @@ class Mancala
         {
             this->board[this->y][this->x]++;
             
-            if(this->x == 5 && this->y == 0)
+            if(this->x == 0 && this->y == 0)
             {
                 this->y = 1;
+                if(player == 0)
+                {
+                    i++; // player scored a point, subtract a move before going into the for-loop move handler
+                    topScore++; // the right goal / bottom score player scores on this side of the board
+                }
             }
             else if(this->x == 5 && this->y == 1)
             {
                 this->y = 0;
+                if (player == 1)
+                {
+                    i++; // player scored a point, subtract a move before going into the for-loop move handler
+                    bottomScore++; // the left goal / top score player scores on this side of the board
+                }
             }
 
-            if(y == 0)
+            if(i == numMoves)
             {
-                this->x++;
+                updateTurnPlayer = false;
+                std::cout << "TPU off\n";
+                // we may have incremented i in the previous if-else block, so check if we reached out loop limit here
+                // if we did, the turn player ended their turn in their goal and therefore should not move horizontally along their row
             }
             else
             {
-                this->x--;
+                // update board position horizontally
+                if (y == 0)
+                {
+                    this->x--;
+                }
+                else if(y == 1)
+                {
+                    this->x++;
+                }
             }
         }
-        this->player = ++this->player % 2;
+        if(updateTurnPlayer)
+        {
+            this->player = ++this->player % 2;
+        }
     }
 
     void DisplayBoard()
@@ -147,18 +170,20 @@ class Mancala
     int y = 0;
     int topScore;
     int bottomScore;
-    int topRow[6] = {14, 4, 4, 4, 4, 4};
-    int bottomRow[6] = {14, 4, 4, 4, 4, 4};
+    int topRow[6] = {4, 4, 4, 4, 4, 4};
+    int bottomRow[6] = {4, 4, 4, 4, 4, 4};
     int* board[2] = {topRow, bottomRow};
     bool gameInProgress = true;
 };
 
 int main(){
     Mancala gameBoard;
-    gameBoard.DisplayBoard();
-    gameBoard.Move();
-    gameBoard.DisplayBoard();
-
+    int testMoves = 10;
+    for(int i = 0; i < testMoves; i++)
+    {
+        gameBoard.DisplayBoard();
+        gameBoard.Move();
+    }
     return 0;
 
 }
